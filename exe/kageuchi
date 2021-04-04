@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "kageuchi"
+require "kageuchi/server"
+
+server = Kageuchi::Server.new(3000)
+server.start
