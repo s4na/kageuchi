@@ -19,7 +19,7 @@ RSpec.describe Kageuchi::Server do
   end
 
   before do
-    port = 3000
+    port = 1234
     @server = Kageuchi::Server.new(port)
 
     Thread.new do
