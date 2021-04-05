@@ -18,8 +18,8 @@ module Kageuchi
 
       loop do
         socket = @server.accept
-        match = socket.gets.chomp.match(/^(?<verb>[A-Z]*) (?<path>[^ ]*) (?<ver>.*)$/)
-        if match
+        request_params = socket.gets.chomp.match(/^(?<verb>[A-Z]*) (?<path>[^ ]*) (?<ver>.*)$/)
+        if request_params
           headers = []
           while line = socket.gets.chomp
             break if line.bytesize.zero?
@@ -27,13 +27,13 @@ module Kageuchi
             headers << line.split(": ")
           end
           request = {
-            VERB: match[:verb],
-            PATH: match[:path],
-            VERSION: match[:ver],
+            VERB: request_params[:verb],
+            PATH: request_params[:path],
+            VERSION: request_params[:ver],
             HEDERS: headers
           }
-          @logs << request
           pp request
+          @logs << request
         end
 
         @status = :running
