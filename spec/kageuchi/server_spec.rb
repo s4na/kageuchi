@@ -16,14 +16,17 @@ RSpec.describe Kageuchi::Server do
     end
   end
 
-  let(:host) { "localhost" }
-  let(:port) { 1234 }
+  let(:host) { "127.0.0.1" }
+  let(:port) { 32_768 }
   let(:server) { Kageuchi::Server.new(host, port) }
 
   before do
     Thread.new do
       server.start
     end
+
+    # Wait for the server to start
+    sleep 1
 
     RequestSender.new(host, port)
     sleep 1 while server.status != :running
