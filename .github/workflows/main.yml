@@ -11,8 +11,12 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 2.7.2
-    - name: Run the default task
+    - name: Start test server
       run: |
-        gem install bundler -v 2.2.15
-        bundle install
-        bundle exec rake
+        docker-compose build
+        docker-compose run --rm app ls
+        echo 'hoge'
+        docker-compose run --rm app ls bin
+        docker-compose run --rm app pwd
+        docker-compose run --rm app ./bin/setup
+        docker-compose run --rm app ./bin/test
