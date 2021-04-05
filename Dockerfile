@@ -1,6 +1,6 @@
 FROM ruby:2.7.2
 
-WORKDIR /
+WORKDIR /app
 RUN apt-get update && apt-get install -y
 
 ADD ./* $HOME/
