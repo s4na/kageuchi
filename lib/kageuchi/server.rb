@@ -6,14 +6,15 @@ module Kageuchi
   class Server
     attr_reader :status, :logs
 
-    def initialize(port)
+    def initialize(host = "localhost", port = 3000)
+      @host = host
       @port = port
       @logs = []
       @status = :created
     end
 
     def start
-      @server = TCPServer.open(@port)
+      @server = TCPServer.open(@host, @port)
 
       loop do
         socket = @server.accept
