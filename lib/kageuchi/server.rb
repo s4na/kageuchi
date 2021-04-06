@@ -4,7 +4,7 @@ require "socket"
 
 module Kageuchi
   class Server
-    attr_reader :status, :logs, :request
+    attr_reader :status, :logs
 
     def initialize(host = "localhost", port = 3000)
       @host = host
@@ -19,7 +19,6 @@ module Kageuchi
       loop do
         @socket = @server.accept
         @status = :running
-
         next unless handle
 
         request_close
@@ -36,28 +35,31 @@ module Kageuchi
     def handle
       request_params = @socket.gets.chomp.match(/^(?<verb>[A-Z]*) (?<path>[^ ]*) (?<ver>.*)$/)
       if request_params
-        headers, line = set_header
-        request = {
-          VERB: request_params[:verb],
-          PATH: request_params[:path],
-          VERSION: request_params[:ver],
-          HEDERS: headers
-        }
+        headers = set_headers
+        request = set_request(request_params, headers)
         pp request
         @logs << request
       end
-
-      line.bytesize.zero?
+      !headers.nil?
     end
 
-    def set_header
+    def set_request(request_params, headers)
+      {
+        VERB: request_params[:verb],
+        PATH: request_params[:path],
+        VERSION: request_params[:ver],
+        HEDERS: headers
+      }
+    end
+
+    def set_headers
       headers = []
       while line = @socket.gets.chomp
         break if line.bytesize.zero?
 
         headers << line.split(": ")
       end
-      [headers, line]
+      headers
     end
 
     def request_close
