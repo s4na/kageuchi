@@ -7,36 +7,38 @@ require "uri"
 
 RSpec.describe Kageuchi::Server do
   class RequestSender # rubocop:disable Lint/ConstantDefinitionInBlock
-    def initialize
-      uri = URI.parse("http://localhost:3000/hello")
-      req = Net::HTTP::Get.new(uri.path)
-      res = Net::HTTP.start(uri.host, uri.port) do |http|
-        http.request(req)
+    def initialize(host, port)
+      uri = URI.parse("http://#{host}:#{port}/hello")
+      request = Net::HTTP::Get.new(uri.path)
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        http.request(request)
       end
-
-      p res
     end
   end
 
-  before do
-    port = 1234
-    @server = Kageuchi::Server.new(port)
+  let(:host) { "127.0.0.1" }
+  let(:port) { 32_768 }
+  let(:server) { Kageuchi::Server.new(host, port) }
 
+  before do
     Thread.new do
-      @server.start
+      server.start
     end
 
-    RequestSender.new
-    sleep 1 while @server.status != :running
+    # Wait for the server to start
+    sleep 1
+
+    RequestSender.new(host, port)
+    sleep 1 while server.status != :running
   end
 
   after do
-    @server.close
+    server.close
   end
 
   describe "#start" do
-    it "" do
-      expect(@server.logs.first).to eq(
+    it do
+      expect(server.logs.first).to eq(
         {
           VERB: "GET",
           PATH: "/hello",
@@ -45,7 +47,7 @@ RSpec.describe Kageuchi::Server do
             ["Accept-Encoding", "gzip;q=1.0,deflate;q=0.6,identity;q=0.3"],
             ["Accept", "*/*"],
             %w[User-Agent Ruby],
-            ["Host", "localhost:3000"]
+            ["Host", "#{host}:#{port}"]
           ]
         }
       )

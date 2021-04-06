@@ -4,5 +4,5 @@
 require "kageuchi"
 require "kageuchi/server"
 
-server = Kageuchi::Server.new(3000)
+server = Kageuchi::Server.new("127.0.0.1", 1234)
 server.start
